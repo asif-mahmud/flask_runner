@@ -34,15 +34,4 @@ APP_CONFIG = dict(
     # JSONIFY_MIMETYPE = 'application/json',
     TEMPLATES_AUTO_RELOAD=True,
     # EXPLAIN_TEMPLATE_LOADING = True,
-
-    #############################################
-    # Eve related configurations
-    # uncomment/edit/modify as required or
-    # include them in devel/prod specific config
-    #############################################
-    URL_PREFIX='api',
-    DOMAIN=dict(),  # empty domain, it will be updated when the
-                    # models are loaded first
-    DOMAIN_SCHEMA_APPEND=False, # Whether or not schema options will be
-                                # appended or replaced
 )

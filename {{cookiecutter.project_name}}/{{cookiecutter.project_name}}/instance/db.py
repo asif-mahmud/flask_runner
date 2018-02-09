@@ -6,9 +6,6 @@ import sqlalchemy as sa
 import sqlalchemy.ext.declarative as declarative
 import sqlalchemy.schema as schema
 # import sqlalchemy.dialects.postgresql as postgresql
-from eve.io.base import BaseJSONEncoder
-from eve_sqlalchemy.validation import ValidatorSQL
-from werkzeug.datastructures import FileStorage
 
 # Recommended naming convention used by Alembic, as various different database
 # providers will autogenerate vastly different names making migrations more
@@ -28,8 +25,7 @@ class ModelBase(object):
     declarative base. This base class provides -
         1. id for any entry
         2. table name in table_name syntax
-        3. _created and _updated columns for eve
-        4. a _etag column for eve 
+        3. _created and _updated columns
     """
 
     # id = sa.Column(
@@ -41,11 +37,10 @@ class ModelBase(object):
     _created = sa.Column(sa.DateTime, default=sa.func.now())
     _updated = sa.Column(sa.DateTime, default=sa.func.now(),
                          onupdate=sa.func.now())
-    _etag = sa.Column(sa.Text, nullable=False)
 
     @declarative.declared_attr
-    def __tablename__(cls):
-        name = cls.__name__
+    def __tablename__(cls):     # pylint: disable=E0213
+        name = cls.__name__     # pylint: disable=E1101
         return (
             name[0].lower() +
             re.sub(
@@ -62,39 +57,6 @@ class ModelBase(object):
         """
         return '{}<{}>'.format(self.__class__.__name__, self.id)
 
-
-class UUIDEncoder(BaseJSONEncoder):
-    """ JSONEconder subclass used by the json render function.
-
-    This is different from BaseJSONEoncoder since it also addresses
-    encoding of UUID
-    """
-
-    def default(self, obj):
-        if isinstance(obj, uuid.UUID):
-            return str(obj)
-        else:
-            # delegate rendering to base class method (the base class
-            # will properly render ObjectIds, datetimes, etc.)
-            return super(UUIDEncoder, self).default(obj)
-
-
-class UUIDValidator(ValidatorSQL):
-    """Validator with UUID support.
-
-    Extends the ValidatorSQL validator adding support for the uuid data-type
-    """
-    def _validate_type_uuid(self, field, value):
-        """Enable UUID type field."""
-        try:
-            uuid.UUID(value)
-        except ValueError:
-            pass
-
-    def _validate_type_media(self, field, value):
-        """Enable handling media type field."""
-        if not isinstance(value, FileStorage):
-            self._error(field, "File was expected, got '%s' instead." % value)
 
 metadata = schema.MetaData(naming_convention=NAMING_CONVENTION)
 Base = declarative.declarative_base(metadata=metadata, cls=ModelBase)

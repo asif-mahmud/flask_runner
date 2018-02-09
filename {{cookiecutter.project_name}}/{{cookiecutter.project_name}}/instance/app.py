@@ -3,33 +3,29 @@
 import os
 import logging
 
-import eve
-import eve_sqlalchemy as es
+import flask
 
-from . import utils
-from . import extensions
-from . import db
+from . import utils         # pylint: disable=E0401
+from . import extensions    # pylint: disable=E0401
+from . import db            # pylint: disable=E0401
 
 
 def create_app():
     app_settings = {}
     if os.environ.get('PROD', ''):
-        from .configs.production import APP_CONFIG
+        from .configs.production import APP_CONFIG  # pylint: disable=E0401
         app_settings = APP_CONFIG
         print('[x] Production config loaded.')
     else:
-        from .configs.development import APP_CONFIG
+        from .configs.development import APP_CONFIG # pylint: disable=E0401
         app_settings = APP_CONFIG
         print('[x] Development config loaded.')
 
-    app = eve.Eve(
+    app = flask.Flask(
         __package__.split('.')[0],
-        settings=app_settings,
-        validator=db.UUIDValidator,
-        json_encoder=db.UUIDEncoder,
-        data=es.SQL,
     )
 
+    # update app settings
     app.config.update(app_settings)
 
     # register the extensions upfront
@@ -37,7 +33,6 @@ def create_app():
 
     # scan for model definitions
     utils.scan_models(app)
-    utils.register_resources(app)
 
     # register blueprints
     utils.scan_blueprints(app)
