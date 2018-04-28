@@ -3,3 +3,4 @@ graft {{cookiecutter.project_name}}/blueprints/*/templates
 graft {{cookiecutter.project_name}}/uwsgi
 graft {{cookiecutter.project_name}}/gunicorn
 graft {{cookiecutter.project_name}}/logs
+graft {{cookiecutter.project_name}}/migrations

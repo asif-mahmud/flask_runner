@@ -41,7 +41,7 @@ def setup_args():
         help='Setup production environment for running the RUN command.'
     )
 
-    return parser, vars(parser.parse_args())
+    return parser, vars(parser.parse_known_args()[0]), parser.parse_known_args()[1]
 
 
 class BaseProcessSpawner():
@@ -95,7 +95,7 @@ class ProdProcessSpawner(BaseProcessSpawner):
 
 
 if __name__ == '__main__':
-    parser, args = setup_args()
+    parser, args, extra_args = setup_args()
     if args['serve']:
         args['run'] = shlex.split('flask run --port=8000')
     if args['gunicorn']:
@@ -130,6 +130,8 @@ if __name__ == '__main__':
                 'migrations',
             ),
         ])
+    if extra_args:
+        args['run'].extend(extra_args)
     try:
         spawner = ProdProcessSpawner(
             args
