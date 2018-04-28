@@ -122,6 +122,14 @@ if __name__ == '__main__':
         )) if args['prod'] else shlex.split('uwsgi --ini {}'.format(
             os.path.join(ini_dir, 'dev.ini')
         ))
+    if args['run'] and 'db' in args['run']:
+        args['run'].extend([
+            '--directory',
+            os.path.join(
+                __package__.split()[0],
+                'migrations',
+            ),
+        ])
     try:
         spawner = ProdProcessSpawner(
             args
